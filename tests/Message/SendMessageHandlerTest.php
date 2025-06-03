@@ -13,15 +13,20 @@ class SendMessageHandlerTest extends KernelTestCase
 {
     use InteractsWithMessenger;
 
-    private readonly MessageRepository $messageRepository;
-    private readonly MessageBusInterface $bus;
+    private MessageRepository $messageRepository;
+    private MessageBusInterface $bus;
 
     protected function setUp(): void
     {
         self::bootKernel();
 
-        $this->messageRepository = self::getContainer()->get(MessageRepository::class);
-        $this->bus = self::getContainer()->get(MessageBusInterface::class);
+        /** @var MessageRepository $messagesRepository */
+        $messagesRepository = self::getContainer()->get(MessageRepository::class);
+        $this->messageRepository = $messagesRepository;
+
+        /** @var MessageBusInterface $bus */
+        $bus = self::getContainer()->get(MessageBusInterface::class);
+        $this->bus = $bus;
     }
 
     public function testMessageIsPersisted(): void

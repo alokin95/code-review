@@ -7,6 +7,7 @@ namespace Controller;
 use App\Enum\MessageStatusEnum;
 use App\Message\SendMessage;
 use App\Tests\Factory\MessageFactory;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Zenstruck\Messenger\Test\InteractsWithMessenger;
 
@@ -19,7 +20,8 @@ class MessageControllerTest extends WebTestCase
         $client = static::createClient();
         $container = static::getContainer();
 
-        $em = $container->get('doctrine')->getManager();
+        /** @var EntityManagerInterface $em */
+        $em = $container->get(EntityManagerInterface::class);
         $em->createQuery('DELETE FROM App\Entity\Message')->execute();
 
         $factory = new MessageFactory($em);
@@ -29,7 +31,13 @@ class MessageControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
 
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $content = $client->getResponse()->getContent();
+
+        if (!is_string($content)) {
+            $this->fail('Response should be a string');
+        }
+
+        $data = json_decode($content, true);
         $this->assertIsArray($data);
         $this->assertArrayHasKey('messages', $data);
         $this->assertCount(1, $data['messages']);
@@ -44,13 +52,22 @@ class MessageControllerTest extends WebTestCase
     public function test_list_returns_empty_when_no_messages(): void
     {
         $client = static::createClient();
-        static::getContainer()->get('doctrine')->getManager()
-            ->createQuery('DELETE FROM App\Entity\Message')->execute();
+        /** @var EntityManagerInterface $em */
+        $em =static::getContainer()->get(EntityManagerInterface::class);
+
+        $em->createQuery('DELETE FROM App\Entity\Message')->execute();
 
         $client->request('GET', '/messages');
 
         $this->assertResponseIsSuccessful();
-        $data = json_decode($client->getResponse()->getContent(), true);
+        $content = $client->getResponse()->getContent();
+
+        if (!is_string($content)) {
+            $this->fail('Response should be a string');
+        }
+
+        /** @var array{messages: list<array{text: string, status: string}>} $data */
+        $data = json_decode($content, true);
         $this->assertArrayHasKey('messages', $data);
         $this->assertCount(0, $data['messages']);
     }

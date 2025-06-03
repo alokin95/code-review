@@ -13,6 +13,9 @@ use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 #[AsTargetedValueResolver('message_filter')]
 class MessageFilterValueResolver implements ValueResolverInterface
 {
+    /**
+     * @return iterable<MessageFilter>
+     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if ($argument->getType() !== MessageFilter::class) {

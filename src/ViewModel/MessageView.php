@@ -8,7 +8,7 @@ final readonly class MessageView
 {
     public function __construct(
         public string $uuid,
-        public string $text,
+        public ?string $text,
         public ?string $status,
     ) {}
 

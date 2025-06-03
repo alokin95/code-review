@@ -12,16 +12,22 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class MessageRepositoryTest extends KernelTestCase
 {
-    private readonly EntityManagerInterface $em;
-    private readonly MessageRepository $messages;
+    private EntityManagerInterface $em;
+    private MessageRepository $messages;
 
     protected function setUp(): void
     {
         self::bootKernel();
-        $this->em = self::getContainer()->get('doctrine')->getManager();
+
+        /** @var EntityManagerInterface $em */
+        $em = self::getContainer()->get(EntityManagerInterface::class);
+
+        $this->em = $em;
         $this->em->createQuery('DELETE FROM App\Entity\Message')->execute();
 
-        $this->messages = self::getContainer()->get(MessageRepository::class);
+        /** @var MessageRepository $messagesRepository */
+        $messagesRepository = self::getContainer()->get(MessageRepository::class);
+        $this->messages = $messagesRepository;
     }
 
     public function test_it_has_connection(): void

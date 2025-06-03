@@ -22,6 +22,9 @@ class MessageRepository extends ServiceEntityRepository
         parent::__construct($registry, Message::class);
     }
 
+    /**
+     * @return Message[]
+     */
     public function findByFilter(MessageFilter $filter): array
     {
         $qb = $this->createQueryBuilder('m');
@@ -33,6 +36,7 @@ class MessageRepository extends ServiceEntityRepository
             ;
         }
 
-        return $qb->getQuery()->execute();
+        /** @var Message[] */
+        return $qb->getQuery()->getResult();
     }
 }
