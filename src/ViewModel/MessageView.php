@@ -10,7 +10,6 @@ final readonly class MessageView
         public string $uuid,
         public string $text,
         public ?string $status,
-        public string $createdAt,
     ) {}
 
     public static function fromEntity(Message $message): self
@@ -19,7 +18,6 @@ final readonly class MessageView
             $message->getUuid()->toRfc4122(),
             $message->getText(),
             $message->getStatus()?->value,
-            $message->getCreatedAt()->format(DATE_ATOM)
         );
     }
 }
