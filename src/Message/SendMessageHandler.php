@@ -21,10 +21,8 @@ class SendMessageHandler
     public function __invoke(SendMessage $sendMessage): void
     {
         $message = new Message();
-        $message->setUuid(Uuid::v6()->toRfc4122());
         $message->setText($sendMessage->text);
         $message->setStatus('sent');
-        $message->setCreatedAt(new \DateTime());
 
         $this->manager->persist($message);
         $this->manager->flush();
