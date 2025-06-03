@@ -11,7 +11,9 @@ class MessageRepositoryTest extends KernelTestCase
     public function test_it_has_connection(): void
     {
         self::bootKernel();
-        
+        $em = self::getContainer()->get('doctrine')->getManager();
+        $em->createQuery('DELETE FROM App\Entity\Message')->execute();
+
         $messages = self::getContainer()->get(MessageRepository::class);
         
         $this->assertSame([], $messages->findAll());
