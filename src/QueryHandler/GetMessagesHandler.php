@@ -14,6 +14,9 @@ final readonly class GetMessagesHandler
     {
     }
 
+    /**
+     * @return array<int, MessageView>
+     */
     public function handle(GetMessagesQuery $query): array
     {
         $messages = $this->repository->findByFilter(
