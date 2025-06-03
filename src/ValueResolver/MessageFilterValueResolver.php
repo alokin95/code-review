@@ -23,8 +23,12 @@ class MessageFilterValueResolver implements ValueResolverInterface
 
         $status = MessageStatusEnum::tryFrom($statusParam);
 
-        if ($status === null) {
-            throw new BadRequestHttpException("Invalid status value: '$statusParam'");
+        if ($statusParam && $status === null) {
+            throw new BadRequestHttpException(sprintf(
+                "'%s' is not a valid value for status. Expected: [%s]",
+                $statusParam,
+                implode(', ', array_map(fn(MessageStatusEnum $status) => $status->value, MessageStatusEnum::cases()))
+            ));
         }
 
         return [new MessageFilter($status)];
