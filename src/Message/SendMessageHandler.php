@@ -7,7 +7,6 @@ use App\Entity\Message;
 use App\Enum\MessageStatusEnum;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Uid\Uuid;
 
 #[AsMessageHandler]
 /**
