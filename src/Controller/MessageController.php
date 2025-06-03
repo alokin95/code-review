@@ -3,13 +3,19 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Message;
+use App\Enum\MessageStatusEnum;
+use App\Filter\MessageFilter;
 use App\Message\SendMessage;
+use App\Query\GetMessagesQuery;
+use App\QueryHandler\GetMessagesHandler;
 use App\Repository\MessageRepository;
+use App\ViewModel\MessageView;
 use Controller\MessageControllerTest;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\ValueResolver;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -24,21 +30,15 @@ class MessageController extends AbstractController
      * TODO: cover this method with tests, and refactor the code (including other files that need to be refactored)
      */
     #[Route('/messages')]
-    public function list(Request $request, MessageRepository $messages): Response
+    public function list(
+        #[ValueResolver('message_filter')] MessageFilter $filter,
+        GetMessagesHandler $handler
+    ): Response
     {
-        $messages = $messages->by($request);
-  
-        foreach ($messages as $key=>$message) {
-            $messages[$key] = [
-                'uuid' => $message->getUuid(),
-                'text' => $message->getText(),
-                'status' => $message->getStatus(),
-            ];
-        }
-        
-        return new Response(json_encode([
-            'messages' => $messages,
-        ], JSON_THROW_ON_ERROR), headers: ['Content-Type' => 'application/json']);
+        $query = new GetMessagesQuery($filter);
+        $messages = $handler->handle($query);
+
+        return $this->json(['messages' => $messages]);
     }
 
     #[Route('/messages/send', methods: ['GET'])]

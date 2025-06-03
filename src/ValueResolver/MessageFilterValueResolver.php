@@ -1,0 +1,32 @@
+<?php
+
+namespace App\ValueResolver;
+
+use App\Enum\MessageStatusEnum;
+use App\Filter\MessageFilter;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\AsTargetedValueResolver;
+use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
+use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+
+#[AsTargetedValueResolver('message_filter')]
+class MessageFilterValueResolver implements ValueResolverInterface
+{
+    public function resolve(Request $request, ArgumentMetadata $argument): iterable
+    {
+        if ($argument->getType() !== MessageFilter::class) {
+            return [];
+        }
+
+        $statusParam = $request->query->getString('status');
+
+        $status = MessageStatusEnum::tryFrom($statusParam);
+
+        if ($status === null) {
+            throw new BadRequestHttpException("Invalid status value: '$statusParam'");
+        }
+
+        return [new MessageFilter($status)];
+    }
+}
